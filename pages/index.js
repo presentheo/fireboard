@@ -1,6 +1,52 @@
+
+
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getFirestore, collection, getDocs , query } from "firebase/firestore"; 
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBpbSyV_FuKf2Sqr1OrS-4_KDGb4f4U8C4",
+  authDomain: "bbspractice-9d83e.firebaseapp.com",
+  projectId: "bbspractice-9d83e",
+  storageBucket: "bbspractice-9d83e.appspot.com",
+  messagingSenderId: "674020855689",
+  appId: "1:674020855689:web:43f61c88857d53c9655b58",
+  measurementId: "G-26TK9J2J4Y"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore();
+
+let commentListArray = [];
+
+async function getCommentList() {
+  const querySnapshot = await getDocs(collection(db, "commentList"));
+  return querySnapshot;
+}
+
+getCommentList().then((commentList) => {
+  commentList.forEach((comment) => {
+    commentListArray.push(comment.data())
+  })
+})
+
+// const querySnapshot = await getDocs(collection(db, "commentList"));
+// querySnapshot.forEach((comment) => {
+//   console.log(comment.timestamp)
+// })
+
+// const analytics = getAnalytics(app);
 
 export default function Home() {
   return (
@@ -11,59 +57,69 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <main>
+        <div className="container">
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+          <header>
+            <button>로그인</button>
+            <button>회원가입</button>
+          </header>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+          <div className="main-wrapper">
+            <div className="main-image-wrapper">
+              <img src="https://via.placeholder.com/1200x440" alt=""/>
+            </div>
+            <div>
+              <h2>댓글을 남겨주세용</h2>
+            </div>
+          </div>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+          <div className="comment-input-wrapper">
+            <textarea name="" id="commentInput" cols="30" rows="10"></textarea>
+            <button>댓글 남기기</button>
+          </div>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+
+
+          <div className="comment-list-wrapper" id="commentListEl">
+            {commentListArray.forEach(comment => {
+              return (<div>{comment.content}</div>)
+            })}
+
+
+            {/* {getCommentList().then(commentList => {
+              commentList.forEach(comment => {
+                return (
+                  <div className="comment">
+                    <div>
+                      <p>{comment.data().content}</p>
+                    </div>
+                    <div>
+                      <button>{comment.data().like}</button>
+                      <button>{comment.data().dislike}</button>
+                    </div>
+                  </div>
+                )
+              })
+            })} */}
+
+            <div className="comment">
+              <div>
+                <p>와 정말 최고다</p>
+              </div>
+              <div>
+                <button>좋아요</button>
+                <button>싫어요</button>
+              </div>
+            </div>
+          </div>
+
         </div>
+
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+
     </div>
   )
 }
