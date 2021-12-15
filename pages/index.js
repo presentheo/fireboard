@@ -4,10 +4,13 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
+// Import hooks
+import {useEffect, useState} from 'react'
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs , query } from "firebase/firestore"; 
+import { getFirestore, collection, getDocs, addDoc, query, orderBy } from "firebase/firestore"; 
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -28,27 +31,54 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 
-let commentListArray = [];
-
-async function getCommentList() {
-  const querySnapshot = await getDocs(collection(db, "commentList"));
-  return querySnapshot;
-}
-
-getCommentList().then((commentList) => {
-  commentList.forEach((comment) => {
-    commentListArray.push(comment.data())
-  })
-})
-
-// const querySnapshot = await getDocs(collection(db, "commentList"));
-// querySnapshot.forEach((comment) => {
-//   console.log(comment.timestamp)
-// })
-
-// const analytics = getAnalytics(app);
-
 export default function Home() {
+
+  let commentListArray = [];
+
+
+  const [commentList, setCommentList] = useState([]);
+  const [commentContent, setCommentContent] = useState("");
+
+  const getCommentList = async () => {
+    try {
+      const snapshot = query(collection(db, "commentList"), orderBy("timestamp", "desc"))
+      const q = await getDocs(snapshot); 
+      q.forEach((e) => {
+        commentListArray.push(e.data())
+      })
+      setCommentList(commentListArray)
+      console.log(q)
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  useEffect(() => {
+    getCommentList()
+  }, [])
+
+  const postComment = async (content) => {
+    try{
+      const docRef = await addDoc(collection(db, "commentList"), {
+        content: commentContent,
+        timestamp: new Date(),
+        like: 0,
+        dislike: 0,
+        author: "",
+        isRemoved: false
+      });
+      console.log("Document written!");
+      getCommentList();
+      setCommentContent("");
+    } catch(error) {
+      console.log(error)
+    }
+  }
+
+  const handleChange = (event) => {
+    setCommentContent(event.target.value)
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -67,52 +97,43 @@ export default function Home() {
 
           <div className="main-wrapper">
             <div className="main-image-wrapper">
-              <img src="https://via.placeholder.com/1200x440" alt=""/>
+              <img src="https://blog.kakaocdn.net/dn/PPTU5/btqQfL0H1rI/aYLkahJpk3GUcVAOU1iOoK/img.jpg" alt=""/>
             </div>
             <div>
-              <h2>댓글을 남겨주세용</h2>
+              <h1>천하제일 댓글대회!</h1>
+              <p>위 사진에 가장 어울리는 댓글을 달아주세요.</p>
             </div>
           </div>
 
           <div className="comment-input-wrapper">
-            <textarea name="" id="commentInput" cols="30" rows="10"></textarea>
-            <button>댓글 남기기</button>
+            <textarea value={commentContent} onChange={(e) => {handleChange(e)}} name="" id="commentInput" cols="30" rows="10"></textarea>
+            <button onClick={() => {postComment()}}>댓글 남기기</button>
           </div>
 
-
-
-
           <div className="comment-list-wrapper" id="commentListEl">
-            {commentListArray.forEach(comment => {
-              return (<div>{comment.content}</div>)
-            })}
+            {commentList.map((comment) => {
 
+              let date = comment.timestamp.toDate();
 
-            {/* {getCommentList().then(commentList => {
-              commentList.forEach(comment => {
+              if (!comment.isRemoved) {
                 return (
                   <div className="comment">
                     <div>
-                      <p>{comment.data().content}</p>
+                      <p>{comment.content}</p>
                     </div>
                     <div>
-                      <button>{comment.data().like}</button>
-                      <button>{comment.data().dislike}</button>
+                      <button>👍{comment.like}</button>
+                      <button>👎{comment.dislike}</button>
+                    </div>
+                    <div>
+                      <span>{`${date.getMonth()}월 ${date.getDate()}일 ${date.getHours()}시 ${date.getMinutes()}분` }</span>
                     </div>
                   </div>
                 )
-              })
-            })} */}
+              }
 
-            <div className="comment">
-              <div>
-                <p>와 정말 최고다</p>
-              </div>
-              <div>
-                <button>좋아요</button>
-                <button>싫어요</button>
-              </div>
-            </div>
+            })}
+
           </div>
 
         </div>

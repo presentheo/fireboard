@@ -14,3 +14,11 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.comment {
+  display: flex;
+}
+.container {
+  max-width: 900px;
+  margin: 60px auto 0;
+}
