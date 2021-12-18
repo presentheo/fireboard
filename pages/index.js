@@ -57,7 +57,7 @@ export default function Home() {
     getCommentList()
   }, [])
 
-  const postComment = async (content) => {
+  const postComment = async () => {
     try{
       const docRef = await addDoc(collection(db, "commentList"), {
         content: commentContent,
