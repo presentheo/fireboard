@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "commentList",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "content",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
