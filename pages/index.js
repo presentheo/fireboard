@@ -1,6 +1,7 @@
 // Import hooks
 import {useEffect, useState} from 'react'
 import Head from 'next/head'
+import Image from 'next/image'
 
 // Import bootstrap components
 import { Container, Row, Col, Modal, Form, FormControl, InputGroup, Button } from 'react-bootstrap';
@@ -10,7 +11,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, addDoc, query, orderBy } from "firebase/firestore"; 
+import { getFirestore, collection, getDocs, addDoc, query, orderBy } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -161,7 +162,8 @@ export default function Home() {
         timestamp: new Date(),
         like: 0,
         dislike: 0,
-        author: "",
+        author: userData.email,
+        uid: userData.uid,
         isRemoved: false
       });
       console.log("Document written!");
@@ -187,7 +189,7 @@ export default function Home() {
       <main>
         <Container>
 
-          <header>
+          <header className="mb-3">
             { isLogin && <Button variant="danger" onClick={() => logout()}>로그아웃</Button>}
             { !isLogin && <Button onClick={() => setShowLoginModal(true)}>로그인</Button>}
             { !isLogin && <Button onClick={() => setShowSignupModal(true)}>회원가입</Button>}
@@ -264,15 +266,19 @@ export default function Home() {
                 return (
                   <div className="comment" key={index}>
                     <Row border="primary">
-                      <Col>
-                        <p>{comment.content}</p>
+                      <Col xs={1}>
+                        <Image src={userData.photoURL ? userData.photoURL : "/userDefault.png"} width={40} height={40}/>
                       </Col>
-                      <Col>
+                      <Col xs={2}>
+                        <p className="comment-author">{comment.author}</p>
+                        <p className="comment-time">{`${date.getMonth() + 1}월 ${date.getDate()}일 ${date.getHours()}시 ${date.getMinutes()}분` }</p>
+                      </Col>
+                      <Col xs={7}>
+                        <p className="comment-content">{comment.content}</p>
+                      </Col>
+                      <Col xs={2}>
                         <Button>👍{comment.like}</Button>
                         <Button>👎{comment.dislike}</Button>
-                      </Col>
-                      <Col>
-                        <span>{`${date.getMonth() + 1}월 ${date.getDate()}일 ${date.getHours()}시 ${date.getMinutes()}분` }</span>
                       </Col>
                     </Row>
                   </div>

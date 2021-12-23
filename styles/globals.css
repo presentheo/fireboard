@@ -1,24 +1,20 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 .comment {
-  display: flex;
+  box-sizing: border-box;
+  border-top: 1px solid #ddd;
+  padding: 1em 0;
 }
-.container {
-  max-width: 900px;
-  margin: 60px auto 0;
+.comment-author {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+.comment-time {
+  font-size: 0.8em;
+  margin-bottom: 0;
+}
+.comment-content {
+  margin-bottom: 0;
+}
+.comment>.row{
+  align-items: center;
 }
