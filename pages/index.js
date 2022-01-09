@@ -31,8 +31,6 @@ const auth = getAuth();
 const db = getFirestore();
 
 export default function Home() {
-  
-  let commentListArray = [];
 
   const [userData, setUserData] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
@@ -59,29 +57,21 @@ export default function Home() {
   // 로그인
   const login = async (email, password) => {
     try {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log(userCredential.user)
-          // setIsLogin(true)
-          // setShowLoginModal(false)
-        })
-        .catch((error) => {
-          console.log(error.code)
-
-          switch (error.code) {
-            case "auth/invalid-email":
-              alert("등록되지 않은 이메일 주소입니다.")
-              break;
-            case "auth/wrong-password":
-              alert("비밀번호를 확인해주세요.")
-              break;
-            default:
-              alert(`예기치 못한 오류가 발생했습니다. Errorcode: ${error.code}`)
-              break;
-          }
-        })
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      console.log(userCredential.user)
     } catch (error) {
       console.log(error)
+      switch (error.code) {
+        case "auth/invalid-email":
+          alert("등록되지 않은 이메일 주소입니다.")
+          break;
+        case "auth/wrong-password":
+          alert("비밀번호를 확인해주세요.")
+          break;
+        default:
+          alert(`예기치 못한 오류가 발생했습니다. Errorcode: ${error.code}`)
+          break;
+      }
     }
   }
 
@@ -97,30 +87,25 @@ export default function Home() {
   // 회원가입
   const signup = async (email, password) => {
     try {
-      createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        confirm("회원가입이 완료되었습니다!")
-        setShowSignupModal(false)
-      })
-      .catch((error) => {
-        console.log(error.code);
-        switch (error.code) {
-          case "auth/email-already-in-use":
-            alert("중복된 이메일입니다.")
-            break;
-          case "auth/weak-password":
-            alert("비밀번호를 6자리 이상 입력해주세요.")
-            break;
-          case "auth/invalid-email":
-            alert("유효하지 않은 이메일 주소입니다.")
-            break;
-          default:
-            alert(`예기치 못한 오류가 발생했습니다. Errorcode: ${error.code}`)
-            break;
-        }
-      })
+      const userAuth = await createUserWithEmailAndPassword(auth, email, password)
+      confirm("회원가입이 완료되었습니다!")
+      setShowSignupModal(false)
     } catch (error) {
-      console.log(error)
+      console.log(error.code)
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          alert("중복된 이메일입니다.")
+          break;
+        case "auth/weak-password":
+          alert("비밀번호를 6자리 이상 입력해주세요.")
+          break;
+        case "auth/invalid-email":
+          alert("유효하지 않은 이메일 주소입니다.")
+          break;
+        default:
+          alert(`예기치 못한 오류가 발생했습니다. Errorcode: ${error.code}`)
+          break;
+      }
     }
   }
 
@@ -142,6 +127,7 @@ export default function Home() {
   // 댓글 DB 읽어오기
   const getCommentList = async () => {
     try {
+      let commentListArray = [];
       const snapshot = query(collection(db, "commentList"), orderBy("timestamp", "desc"))
       const q = await getDocs(snapshot); 
       q.forEach((e) => {
@@ -258,7 +244,7 @@ export default function Home() {
           </div>
 
           <div className="comment-list-wrapper mt-5 mb-5" id="commentListEl">
-            {commentList.map((comment, index) => {
+            {commentList && commentList.map((comment, index) => {
 
               let date = comment.timestamp.toDate();
 
@@ -266,16 +252,16 @@ export default function Home() {
                 return (
                   <div className="comment" key={index}>
                     <Row border="primary">
-                      <Col xs={1}>
+                      {/* <Col xs={1}>
                         <Image src={userData.photoURL ? userData.photoURL : "/userDefault.png"} width={40} height={40}/>
-                      </Col>
+                      </Col> */}
                       <Col xs={2}>
                         <p className="comment-author">{comment.author}</p>
                         <p className="comment-time">{`${date.getMonth() + 1}월 ${date.getDate()}일 ${date.getHours()}시 ${date.getMinutes()}분` }</p>
                       </Col>
                       <Col xs={7}>
                         <p className="comment-content">{comment.content}</p>
-                      </Col>
+``                      </Col>
                       <Col xs={2}>
                         <Button>👍{comment.like}</Button>
                         <Button>👎{comment.dislike}</Button>
